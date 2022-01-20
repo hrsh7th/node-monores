@@ -1,17 +1,21 @@
 {
   "name": "monores",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "monorepo scripts.",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
-  "typings": "dts/index.d.ts",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "typings": "dist/dts/index.d.ts",
   "scripts": {
     "build": "npm run build:cjs && npm run build:mjs && npm run build:dts",
     "build:cjs": "tsc --project ./tsconfig.json --outDir dist/cjs --module commonjs",
     "build:mjs": "tsc --project ./tsconfig.json --outDir dist/mjs --module esnext",
     "build:dts": "tsc --project ./tsconfig.json --outDir dist/dts --emitDeclarationOnly",
+    "prepublish": "npm run build && npm run test",
     "test": "jest"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hrsh7th/node-monores.git"
