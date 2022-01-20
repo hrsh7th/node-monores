@@ -1,0 +1,7 @@
+{
+  "name": "@example/package-b",
+  "version": "0.0.0",
+  "dependencies": {
+    "@example/package-a": "0.0.0"
+  }
+}

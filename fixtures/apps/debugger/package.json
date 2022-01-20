@@ -1,0 +1,8 @@
+{
+  "name": "@example/debugger",
+  "version": "0.0.0",
+  "dependencies": {
+    "@example/package-a": "0.0.0",
+    "@example/package-b": "0.0.0"
+  }
+}
