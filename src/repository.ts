@@ -1,5 +1,6 @@
 import glob from 'glob';
 import path from 'path';
+import { DependencyField } from '.';
 
 import { Cache } from './cache';
 import { Package } from './package';
@@ -16,7 +17,7 @@ export const getRootPackage = () => {
       if (Package.is(dir)) {
         const packageJson = require(path.join(dir, 'package.json'));
         if (packageJson.workspaces) {
-          return new Package({ dir });
+          return createPackage(dir);
         }
       }
       dir = path.dirname(dir);
@@ -41,7 +42,7 @@ export const getPackages = (filterPattern = '**/*') => {
       }).forEach((dir: string) => {
         dir = path.dirname(dir);
         if (Package.is(dir)) {
-          const p = new Package({ dir, rootPackage })
+          const p = createPackage(dir, rootPackage);
           if (p.match(filterPattern)) {
             packages.push(p)
           }
@@ -53,21 +54,35 @@ export const getPackages = (filterPattern = '**/*') => {
 };
 
 /**
- * Update version.
+ * Update package versions.
  */
-export const updateVersion = (target: Package, version: string) => {
+export const updatePackageVersion = (target: Package, version: string) => {
   getPackages().forEach((p: Package) => {
     if (p.packageJson.name === target.packageJson.name) {
       p.packageJson.version = version;
     } else {
-      (['dependencies', 'devDependencies', 'peerDependencies', 'acceptDependencies'] as const).forEach(depsField => {
+      Object.values(DependencyField).forEach(depsField => {
         const deps = p.packageJson[depsField];
         if (deps && deps[target.packageJson.name]) {
           deps[target.packageJson.name] = version;
         }
       })
     }
-    p.writePackageJson();
   });
 };
 
+/**
+ * Write all package.json.
+ */
+export const writePackageJsons = (filterPattern = '**/*') => {
+  getPackages(filterPattern).forEach(p => p.writePackageJson());
+};
+
+/**
+ * Create and cache package.
+ */
+const createPackage = (dir: string, rootPackage?: Package) => {
+  return cache.ensure(['createPackage', dir], () => {
+    return new Package({ dir, rootPackage });
+  })
+};

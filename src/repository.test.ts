@@ -1,5 +1,5 @@
 import path from "path";
-import { getPackages, getRootPackage } from ".";
+import { getPackages, getRootPackage, updatePackageVersion } from ".";
 
 describe('repository', () => {
 
@@ -13,6 +13,14 @@ describe('repository', () => {
     expect(getPackages()).toHaveLength(3);
     expect(getPackages('apps/*')).toHaveLength(1);
     expect(getPackages('packages/*')).toHaveLength(2);
+  });
+
+  it('updatePackageVersion', () => {
+    process.chdir(path.resolve(__dirname, '../fixtures/apps/debugger'));
+    const aPackage = getPackages('packages/**/package-a').pop();
+    updatePackageVersion(aPackage!, '1.0.0');
+    const debuggerPackage = getPackages('apps/**/debugger').pop()!;
+    expect(debuggerPackage.findDependencies({ pattern: /^@example\/package-a/ }).pop()!.version).toBe('1.0.0');
   });
   
 });
