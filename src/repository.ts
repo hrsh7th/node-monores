@@ -11,15 +11,15 @@ const cache = new Cache();
  */
 export const getRootPackage = () => {
   return cache.ensure<Package>('getRootPackage', () => {
-    let filepath = process.cwd();
-    while (filepath !== '/') {
-      if (Package.is(filepath)) {
-        const packageJson = require(path.join(filepath, 'package.json'));
+    let dir = process.cwd();
+    while (dir !== '/') {
+      if (Package.is(dir)) {
+        const packageJson = require(path.join(dir, 'package.json'));
         if (packageJson.workspaces) {
-          return new Package({ filepath });
+          return new Package({ dir });
         }
       }
-      filepath = path.dirname(filepath);
+      dir = path.dirname(dir);
     }
     throw new Error(`can't detect workspace root directory.`);
   })
@@ -35,13 +35,13 @@ export const getPackages = (filterPattern = '**/*') => {
     const patterns = Array.isArray(workspaces) ? workspaces : workspaces.packages ?? [];
     return patterns.reduce((packages: Package[], pattern: string) => {
       glob.sync(`${pattern}/package.json`, {
-        cwd: rootPackage.filepath,
+        cwd: rootPackage.dir,
         absolute: true,
         ignore: '**/node_modules',
-      }).forEach((filepath: string) => {
-        filepath = path.dirname(filepath);
-        if (Package.is(filepath)) {
-          const p = new Package({ filepath, rootPackage })
+      }).forEach((dir: string) => {
+        dir = path.dirname(dir);
+        if (Package.is(dir)) {
+          const p = new Package({ dir, rootPackage })
           if (p.match(filterPattern)) {
             packages.push(p)
           }

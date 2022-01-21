@@ -5,7 +5,7 @@ describe('repository', () => {
 
   it('getRootPackage', () => {
     process.chdir(path.resolve(__dirname, '../fixtures/apps/debugger'));
-    expect(getRootPackage().filepath).toBe(path.resolve(__dirname, '../fixtures'));
+    expect(getRootPackage().dir).toBe(path.resolve(__dirname, '../fixtures'));
   });
 
   it('getPackages', () => {

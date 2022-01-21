@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import minimatch from 'minimatch';
-import type { PackageJson } from '.';
+import { Dependency, DependencyField, PackageJson } from '.';
 
 export class Package {
 
   /**
-   * filepath.
+   * dir.
    */
-  public readonly filepath: string;
+  public readonly dir: string;
 
   /**
    * package.json.
@@ -22,18 +22,18 @@ export class Package {
   private rootPackage?: Package;
 
   /**
-   * Return the filepath is module or not.
+   * Return the dir is module or not.
    */
-  public static is(filepath: string) {
-    return fs.existsSync(path.join(filepath, 'package.json'));
+  public static is(dir: string) {
+    return fs.existsSync(path.join(dir, 'package.json'));
   }
 
   public constructor(args: {
-    filepath: string;
+    dir: string;
     rootPackage?: Package,
   }) {
-    this.filepath = args.filepath;
-    this.packageJson = require(path.resolve(args.filepath, 'package.json'));
+    this.dir = args.dir;
+    this.packageJson = require(path.resolve(args.dir, 'package.json'));
     this.rootPackage = args.rootPackage;
   }
   
@@ -44,14 +44,60 @@ export class Package {
     if (!this.rootPackage) {
       return false;
     }
-    return minimatch(path.relative(this.rootPackage.filepath, this.filepath), pattern);
+    return minimatch(path.relative(this.rootPackage.dir, this.dir), pattern);
+  }
+
+  /**
+   * Find dependencies.
+   */
+  findDependencies(option: { fields?: DependencyField[], pattern: RegExp }): Dependency[] {
+    return (option.fields ?? Object.values(DependencyField)).reduce((dependencies, field) => {
+      Object.entries(this.packageJson[field] ?? {}).forEach(([name, version]) => {
+        if (option.pattern.test(name)) {
+          dependencies.push({
+            field: field,
+            name: name,
+            version: version,
+          });
+        }
+      });
+      return dependencies;
+    }, [] as Dependency[]);
+  }
+
+  /**
+   * Get dependency.
+   */
+  getDependency(field: DependencyField, name: string): Dependency | null {
+    if (this.packageJson[field]) {
+      if (this.packageJson[field]?.[name]) {
+        return {
+          field: field,
+          name: name,
+          version: this.packageJson[field]![name],
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Set dependency.
+   */
+  setDependency(field: DependencyField, name: string, version: string | null) {
+    this.packageJson[field] = this.packageJson[field] ?? {};
+    if (version) {
+      this.packageJson[field]![name] = version;
+    } else {
+      delete this.packageJson[field]?.[name];
+    }
   }
 
   /**
    * Write package.json.
    */
   writePackageJson() {
-    fs.writeFileSync(path.join(this.filepath, 'package.json'), JSON.stringify(this.packageJson, null, 2));
+    fs.writeFileSync(path.join(this.dir, 'package.json'), JSON.stringify(this.packageJson, null, 2));
   }
 
 }
