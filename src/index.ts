@@ -15,6 +15,7 @@ export interface PackageJson {
   devDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   acceptDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
 }
 
 export const DependencyField = {
