@@ -9,6 +9,7 @@
     "noEmitHelpers": true,
     "importHelpers": true,
     "isolatedModules": true,
+    "skipLibCheck": true,
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,

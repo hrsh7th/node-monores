@@ -1,6 +1,8 @@
 import path from "path";
 import { Package } from ".";
 
+import { describe, it, expect } from 'vitest';
+
 describe('package', () => {
 
   it('.is', () => {

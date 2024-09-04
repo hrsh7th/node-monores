@@ -1,4 +1,4 @@
-import glob from 'glob';
+import { globSync } from 'glob';
 import path from 'path';
 import { DependencyField } from '.';
 
@@ -35,7 +35,7 @@ export const getPackages = (filterPattern = '**/*') => {
     const workspaces = rootPackage.packageJson.workspaces!;
     const patterns = Array.isArray(workspaces) ? workspaces : workspaces.packages ?? [];
     return patterns.reduce((packages: Package[], pattern: string) => {
-      glob.sync(`${pattern}/package.json`, {
+      globSync(`${pattern}/package.json`, {
         cwd: rootPackage.dir,
         absolute: true,
         ignore: '**/node_modules',
@@ -63,8 +63,8 @@ export const updatePackageVersion = (target: Package, version: string) => {
     } else {
       Object.values(DependencyField).forEach(depsField => {
         const deps = p.packageJson[depsField];
-        if (deps && deps[target.packageJson.name]) {
-          deps[target.packageJson.name] = version;
+        if (deps && deps[target.packageJson.name!]) {
+          deps[target.packageJson.name!] = version;
         }
       })
     }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import { Dependency, DependencyField, PackageJson } from '.';
 
 export class Package {
@@ -36,7 +36,7 @@ export class Package {
     this.packageJson = require(path.resolve(args.dir, 'package.json'));
     this.rootPackage = args.rootPackage;
   }
-  
+
   /**
    * match by glob pattern.
    */
@@ -57,7 +57,7 @@ export class Package {
           dependencies.push({
             field: field,
             name: name,
-            version: version,
+            version: version!,
           });
         }
       });
@@ -74,7 +74,7 @@ export class Package {
         return {
           field: field,
           name: name,
-          version: this.packageJson[field]![name],
+          version: this.packageJson[field]![name]!,
         }
       }
     }
@@ -97,7 +97,7 @@ export class Package {
    * Write package.json.
    */
   writePackageJson() {
-    fs.writeFileSync(path.join(this.dir, 'package.json'), JSON.stringify(this.packageJson, null, 2));
+    fs.writeFileSync(path.join(this.dir, 'package.json'), JSON.stringify(this.packageJson, null, 2).trim());
   }
 
 }

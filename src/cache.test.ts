@@ -1,9 +1,11 @@
 import { Cache } from "./cache";
 
+import { describe, it, expect, vi } from 'vitest';
+
 describe('cache', () => {
 
   it('#ensure', () => {
-    const ensure = jest.fn(() => 1);
+    const ensure = vi.fn(() => 1);
     const cache = new Cache();
     expect(cache.ensure('a', ensure)).toBe(1);
     expect(ensure).toHaveBeenCalledTimes(1);
@@ -19,5 +21,5 @@ describe('cache', () => {
     cache.delete('a');
     expect(cache.get('a')).toBe(null);
   });
-  
+
 });

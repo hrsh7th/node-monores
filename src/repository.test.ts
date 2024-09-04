@@ -1,6 +1,8 @@
 import path from "path";
 import { getPackages, getRootPackage, updatePackageVersion } from ".";
 
+import { describe, it, expect } from 'vitest';
+
 describe('repository', () => {
 
   it('getRootPackage', () => {
@@ -22,5 +24,5 @@ describe('repository', () => {
     const debuggerPackage = getPackages('apps/**/debugger').pop()!;
     expect(debuggerPackage.findDependencies({ pattern: /^@example\/package-a/ }).pop()!.version).toBe('1.0.0');
   });
-  
+
 });
